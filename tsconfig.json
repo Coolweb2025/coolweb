@@ -22,6 +22,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/lib/arrayCeil.js",
+    "app/components/hero/hero.js",
+    "app/components/cookie/CookieConsentBannerjs/CookieConsentBanner.js"
+  ],
   "exclude": ["node_modules"]
 }
