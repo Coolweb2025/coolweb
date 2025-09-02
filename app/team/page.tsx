@@ -1,6 +1,7 @@
 import Header from "../globals/header";
 import Footer from "../globals/footer";
 import { fetchTeam } from "../lib/api";
+import Image from "next/image";
 
 export default async function Team() {
   const members = await fetchTeam().catch(() => []);
@@ -10,16 +11,23 @@ export default async function Team() {
       <div className="font-sans w-full p-8 pb-20 sm:p-20">
         <section className="max-w-5xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">Our team</h1>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {members.map((m) => (
               <li key={m.id} className="rounded-lg border p-4 bg-white/50">
-                <div className="text-sm text-gray-500 mb-2">{m.image}</div>
+                <div className="text-sm text-gray-500 mb-2 flex justify-center">
+                  <Image
+                    src={`/images/team/${m.image}`}
+                    alt={m.full_name}
+                    width={500}
+                    height={400}
+                  />
+                </div>
                 <h3 className="text-lg font-semibold">{m.full_name}</h3>
                 <p className="text-sm text-gray-700">{m.role}</p>
                 <div className="flex gap-3 mt-2">
                   {m.fb_url && (
                     <a
-                      className="text-blue-700 underline"
+                      className="text-teal-600 underline"
                       href={m.fb_url}
                       target="_blank"
                       rel="noreferrer"
@@ -29,7 +37,7 @@ export default async function Team() {
                   )}
                   {m.linkedin_url && (
                     <a
-                      className="text-blue-700 underline"
+                      className="text-teal-600 underline"
                       href={m.linkedin_url}
                       target="_blank"
                       rel="noreferrer"

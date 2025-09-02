@@ -154,7 +154,7 @@ function ensure_tables(PDO $pdo): void
 function find_resource_and_id(string $path): array
 {
     $segments = array_values(array_filter(explode('/', $path)));
-    $resources = ['hero', 'offer', 'projects', 'blog', 'team'];
+    $resources = ['hero', 'offer', 'projects', 'blog', 'team', 'contact'];
 
     $resource = null;
     $id = null;
@@ -330,6 +330,78 @@ function handle_crud(PDO $pdo, string $method, string $table, array $fields, ?in
     error_json('Method not allowed', 405);
 }
 
+function handle_contact(string $method): void
+{
+    if ($method !== 'POST') {
+        error_json('Method not allowed', 405);
+        return;
+    }
+
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    $name = '';
+    $email = '';
+    $subject = '';
+    $message = '';
+
+    if (stripos($contentType, 'application/json') !== false) {
+        $data = read_json();
+        $name = trim((string)($data['name'] ?? ''));
+        $email = trim((string)($data['email'] ?? ''));
+        $subject = trim((string)($data['subject'] ?? ''));
+        $message = trim((string)($data['message'] ?? ''));
+    } else {
+        $name = trim((string)($_POST['name'] ?? ''));
+        $email = trim((string)($_POST['email'] ?? ''));
+        $subject = trim((string)($_POST['subject'] ?? ''));
+        $message = trim((string)($_POST['message'] ?? ''));
+    }
+
+    if ($name === '' || $email === '' || $subject === '' || $message === '') {
+        error_json('Missing fields: name, email, subject, message are required', 422);
+        return;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_json('Invalid email address', 422);
+        return;
+    }
+
+    require_once __DIR__ . '/../PHPMailer/PHPMailer/Exception.php';
+    require_once __DIR__ . '/../PHPMailer/PHPMailer/PHPMailer.php';
+    require_once __DIR__ . '/../PHPMailer/PHPMailer/SMTP.php';
+
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        $mail->CharSet = 'UTF-8';
+        $mail->isSMTP();
+        $mail->Host = 'mail1.small.pl';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'biuro@coolweb.com.pl';
+        $mail->Password = 'Jqmn7pccts2025!!';
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = 465;
+
+        $mail->addAddress('biuro@coolweb.com.pl');
+        $mail->setFrom('mailer@coolweb.com.pl', 'Mailer');
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeEmail = htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeMsg = nl2br(htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+        $mail->Body = $safeName . '<br>' . $safeEmail . '<br><br>' . $safeMsg;
+        $mail->AltBody = "Name: {$name}\nEmail: {$email}\n\n{$message}";
+
+        $mail->send();
+        send_json(['status' => 'ok', 'message' => 'Dziękujemy! Twoja wiadomość została wysłana :)']);
+    } catch (\Throwable $e) {
+        // Prefer PHPMailer error info if available
+        $err = method_exists($mail, 'ErrorInfo') && !empty($mail->ErrorInfo) ? $mail->ErrorInfo : $e->getMessage();
+        error_json('Nie wysłano wiadomości. Wystąpił błąd: ' . $err, 500);
+    }
+}
+
 try {
     $pdo = get_pdo();
     ensure_tables($pdo);
@@ -343,7 +415,7 @@ $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 [$resource, $id] = find_resource_and_id($path);
 
 if ($resource === null) {
-    send_json(['status' => 'ok', 'message' => 'API ready', 'resources' => ['hero', 'offer', 'projects', 'blog', 'team']]);
+    send_json(['status' => 'ok', 'message' => 'API ready', 'resources' => ['hero', 'offer', 'projects', 'blog', 'team', 'contact']]);
     exit;
 }
 
@@ -366,6 +438,10 @@ switch ($resource) {
 
     case 'team':
         handle_crud($pdo, $method, 'team', ['image', 'full_name', 'role', 'fb_url', 'linkedin_url', 'sort_order'], $id);
+        break;
+
+    case 'contact':
+        handle_contact($method);
         break;
 
     default:
