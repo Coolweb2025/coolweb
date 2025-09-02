@@ -19,10 +19,10 @@ export default function CookiePolicyPage() {
           <section>
             <h2 className="text-lg font-semibold mb-2">1. What are cookies?</h2>
             <p>
-              Cookies are small text files saved on the user's device when using
-              a website. They enable, among other things, the proper functioning
-              of the website, improving its functionality, and analyzing
-              traffic.{" "}
+              Cookies are small text files saved on the user&apos;s device when
+              using a website. They enable, among other things, the proper
+              functioning of the website, improving its functionality, and
+              analyzing traffic.{" "}
             </p>
           </section>
 

@@ -21,6 +21,10 @@ export default function Hero() {
         if (!cancelled) setHero(data ?? { main_title: "", tiles: [] });
       } catch (e) {
         if (!cancelled) setHero({ main_title: "", tiles: [] });
+        if (process.env.NODE_ENV !== "production") {
+          // eslint-disable-next-line no-console
+          console.warn("fetchHero failed", e);
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -30,7 +34,7 @@ export default function Hero() {
     };
   }, []);
 
-  const { observe, unobserve } = useDimensions({
+  const { observe } = useDimensions({
     onResize: ({ observe, unobserve, width }) => {
       setHeroImage(`hero-${arrayCeil(imageSizes, width)}.jpg`);
       // Reconnect observer to keep measurements fresh

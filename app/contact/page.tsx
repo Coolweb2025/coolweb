@@ -25,7 +25,13 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, subject, message }),
       });
-      const data = await res.json().catch(() => ({} as any));
+      type ContactResponse = { status?: string; message?: string; error?: string };
+      let data: ContactResponse = {};
+      try {
+        data = (await res.json()) as ContactResponse;
+      } catch {
+        data = {};
+      }
 
       if (!res.ok) {
         throw new Error(
@@ -41,8 +47,10 @@ export default function Home() {
       setEmail("");
       setSubject("");
       setMessage("");
-    } catch (err: any) {
-      setError(err?.message || "Wystąpił błąd podczas wysyłki");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Wystąpił błąd podczas wysyłki";
+      setError(msg);
     } finally {
       setLoading(false);
     }

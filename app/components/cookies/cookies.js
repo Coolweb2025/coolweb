@@ -3,7 +3,7 @@
 import React from "react";
 import { hasCookie, setCookie } from "cookies-next";
 
-const CookieConsent = (props) => {
+const CookieConsent = () => {
   const [showConsent, setShowConsent] = React.useState(true);
 
   React.useEffect(() => {
