@@ -2,15 +2,21 @@
   "name": "coolweb",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "node app.js",
     "lint": "eslint"
   },
   "dependencies": {
+    "@next/swc-wasm-nodejs": "^15.5.2",
     "@next/third-parties": "^15.5.2",
     "cookies-next": "^6.1.0",
+    "express": "^5.1.0",
     "next": "^15.5.2",
     "react": "19.1.0",
     "react-cookie-consent": "^9.0.0",

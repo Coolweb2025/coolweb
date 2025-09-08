@@ -35,7 +35,7 @@ export default async function Blog() {
               </li>
             ))}
             {items.length === 0 && (
-              <div className="text-gray-500">Brak wpisów</div>
+              <div className="text-gray-500">No new blog entries</div>
             )}
           </ul>
         </section>

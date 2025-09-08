@@ -22,7 +22,6 @@ export default function Hero() {
       } catch (e) {
         if (!cancelled) setHero({ main_title: "", tiles: [] });
         if (process.env.NODE_ENV !== "production") {
-          // eslint-disable-next-line no-console
           console.warn("fetchHero failed", e);
         }
       } finally {

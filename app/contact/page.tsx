@@ -20,12 +20,16 @@ export default function Home() {
     setError(null);
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("https://coolweb.com.pl/api/index.php/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, subject, message }),
       });
-      type ContactResponse = { status?: string; message?: string; error?: string };
+      type ContactResponse = {
+        status?: string;
+        message?: string;
+        error?: string;
+      };
       let data: ContactResponse = {};
       try {
         data = (await res.json()) as ContactResponse;
@@ -41,7 +45,7 @@ export default function Home() {
 
       setSuccess(
         (data.message as string) ||
-          "Dziękujemy! Twoja wiadomość została wysłana :)"
+          "Thank you! Your message goes to our inbox :)"
       );
       setName("");
       setEmail("");
@@ -49,7 +53,9 @@ export default function Home() {
       setMessage("");
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "Wystąpił błąd podczas wysyłki";
+        err instanceof Error
+          ? err.message
+          : "There was an error during sending message...";
       setError(msg);
     } finally {
       setLoading(false);

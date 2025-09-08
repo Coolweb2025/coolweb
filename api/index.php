@@ -149,12 +149,20 @@ function ensure_tables(PDO $pdo): void
       INDEX (sort_order)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     SQL);
+
+    // NEWSLETTER
+    $pdo->exec(<<<SQL
+    CREATE TABLE IF NOT EXISTS newsletter (
+      id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    SQL);
 }
 
 function find_resource_and_id(string $path): array
 {
     $segments = array_values(array_filter(explode('/', $path)));
-    $resources = ['hero', 'offer', 'projects', 'blog', 'team', 'contact'];
+    $resources = ['hero', 'offer', 'projects', 'blog', 'team', 'contact', 'newsletter'];
 
     $resource = null;
     $id = null;
@@ -394,11 +402,47 @@ function handle_contact(string $method): void
         $mail->AltBody = "Name: {$name}\nEmail: {$email}\n\n{$message}";
 
         $mail->send();
-        send_json(['status' => 'ok', 'message' => 'Dziękujemy! Twoja wiadomość została wysłana :)']);
+        send_json(['status' => 'ok', 'message' => 'Thank You! Your message was sent :)']);
     } catch (\Throwable $e) {
         // Prefer PHPMailer error info if available
         $err = method_exists($mail, 'ErrorInfo') && !empty($mail->ErrorInfo) ? $mail->ErrorInfo : $e->getMessage();
-        error_json('Nie wysłano wiadomości. Wystąpił błąd: ' . $err, 500);
+        error_json('Ooopssss... we have some problems with sending message: ' . $err, 500);
+    }
+}
+
+function handle_newsletter(PDO $pdo, string $method): void
+{
+    if ($method !== 'POST') {
+        error_json('Method not allowed', 405);
+        return;
+    }
+
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    $email = '';
+
+    if (stripos($contentType, 'application/json') !== false) {
+        $data = read_json();
+        $email = trim((string)($data['email'] ?? ''));
+    } else {
+        $email = trim((string)($_POST['email'] ?? ''));
+    }
+
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_json('Invalid email address', 422);
+        return;
+    }
+
+    try {
+        $stmt = $pdo->prepare('INSERT INTO newsletter (email) VALUES (:email)');
+        $stmt->execute([':email' => $email]);
+        send_json(['status' => 'ok', 'message' => 'Thank you for subscribe to our newsletter!'], 201);
+    } catch (Throwable $e) {
+        // Duplicate email (unique constraint) -> treat as idempotent success
+        if (preg_match('/duplicate|unique/i', $e->getMessage())) {
+            send_json(['status' => 'ok', 'message' => 'You are subscribed with these email address!'], 200);
+            return;
+        }
+        error_json('Failed to save email: ' . $e->getMessage(), 500);
     }
 }
 
@@ -415,7 +459,7 @@ $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 [$resource, $id] = find_resource_and_id($path);
 
 if ($resource === null) {
-    send_json(['status' => 'ok', 'message' => 'API ready', 'resources' => ['hero', 'offer', 'projects', 'blog', 'team', 'contact']]);
+    send_json(['status' => 'ok', 'message' => 'API ready', 'resources' => ['hero', 'offer', 'projects', 'blog', 'team', 'contact', 'newsletter']]);
     exit;
 }
 
@@ -442,6 +486,10 @@ switch ($resource) {
 
     case 'contact':
         handle_contact($method);
+        break;
+
+    case 'newsletter':
+        handle_newsletter($pdo, $method);
         break;
 
     default:

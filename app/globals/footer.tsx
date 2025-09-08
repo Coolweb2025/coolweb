@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import NewsletterSignup from "../components/newsletter/NewsletterSignup";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -107,50 +107,6 @@ export default function Footer() {
               </ul>
             </section>
 
-            {/* Oferta – skróty */}
-            <nav aria-labelledby="footer-offer" className="mt-2">
-              <h2
-                id="footer-offer"
-                className="text-white text-sm font-semibold uppercase tracking-wider mb-4"
-              >
-                Our offer
-              </h2>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>
-                  <Link
-                    className="hover:text-white hover:underline"
-                    href="/offer"
-                  >
-                    WWW websites
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className="hover:text-white hover:underline"
-                    href="/offer"
-                  >
-                    E-commerce platforms
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className="hover:text-white hover:underline"
-                    href="/offer"
-                  >
-                    Landing pages
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className="hover:text-white hover:underline"
-                    href="/offer"
-                  >
-                    Web applications
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-
             {/* Kontakt */}
             <section aria-labelledby="footer-contact" className="mt-2">
               <h2
@@ -185,6 +141,17 @@ export default function Footer() {
                   </a>
                 </p>
               </address>
+            </section>
+
+            {/* Newsletter */}
+            <section aria-labelledby="footer-newsletter" className="mt-2">
+              <h2
+                id="footer-newsletter"
+                className="text-white text-sm font-semibold uppercase tracking-wider mb-4"
+              >
+                Newsletter
+              </h2>
+              <NewsletterSignup />
             </section>
           </div>
 

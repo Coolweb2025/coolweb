@@ -56,7 +56,7 @@ export type TeamRow = {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
-  "https://coolweb.com.pl/api/index.php/";
+  "https://bpieczka.smallhost.pl/coolweb/api/index.php/";
 
 function buildUrl(path: string): string {
   if (!path.startsWith("/")) path = "/" + path;
