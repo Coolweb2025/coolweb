@@ -45,7 +45,7 @@ export default function Hero() {
   return (
     <div
       ref={observe}
-      className="w-full h-screen flex justify-center items-center overflow-hidden relative bg-black"
+      className="hero w-full flex justify-center items-center overflow-hidden relative bg-black"
     >
       <Image
         src={`/images/${heroImage}`}

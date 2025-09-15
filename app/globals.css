@@ -163,3 +163,21 @@ footer {
     position: static;
   }
 }
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 990px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .hero {
+    min-height: 730px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    min-height: 940px;
+  }
+}
